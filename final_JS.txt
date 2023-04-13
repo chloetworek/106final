@@ -1,1 +1,46 @@
-test
+//Insert Kinnes Bitmoji functions
+
+//Insert Tworek Bitmoji functions
+
+//Define global variables (currentScene, questionsAnswered (could store in player object with other information?))
+var currentScene = 1;
+
+//Insert Kahn button class
+
+//Create startButton object
+
+//Create button objects for submitting questions
+
+//Define Field class to track text fields for users to input words
+
+//Create Field objects for wordScene
+
+//Define scene functions (8 minimum, splash, word list, 5+ question scenes, end scene)
+
+//splashScene function (currentScene === 0)?
+
+//wordScene function
+
+//questionOneScene function
+
+//questionTwoScene function
+
+//questionThreeScene function
+
+//questionFourScene function
+
+//questionFiveScene function
+
+//endScene function
+
+//draw function
+//call each scene drawing function based on scene tracking variable
+
+draw = function() {
+     if(currentScene === 1){
+        
+     }
+};
+
+//mouseClicked function
+//utilize button/field methods to handle mouse clicks
