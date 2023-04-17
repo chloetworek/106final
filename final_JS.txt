@@ -210,7 +210,7 @@ var drawTworekBitmoji = function (bitmojiX, bitmojiY, h){
 };
 
 //Define global variables (currentScene, questionsAnswered (could store in player object with other information?))
-var currentScene = 1;
+var currentScene = 0;
 
 //Insert Kahn button class
 var Button = function(config) {
@@ -222,7 +222,7 @@ var Button = function(config) {
     this.onClick = config.onClick || function() {};
 };
 Button.prototype.draw = function() {
-    fill(0, 234, 255);
+    fill(255, 195, 43);
     rect(this.x, this.y, this.width, this.height, 5);
     fill(0, 0, 0);
     textSize(19);
@@ -242,8 +242,28 @@ Button.prototype.handleMouseClick = function() {
 };
 
 //Create startButton object
+var startButton = new Button({
+    x: 84,
+    y: 264,
+    width: 85,
+    height: 37,
+    label: "START",
+    onClick: function() {
+        currentScene = 1;
+    }
+});
 
-//Create button objects for submitting questions
+//Create helpButton object
+var helpButton = new Button({
+    x: 250,
+    y: 264,
+    width: 85,
+    height: 37,
+    label: "HELP",
+    onClick: function() {
+        currentScene = 2;
+    }
+});
 
 //Define Field class to track text fields for users to input words
 
@@ -259,7 +279,24 @@ var Field = function(x, y, width, height, image){
 
 //Define scene functions (8 minimum, splash, word list, 5+ question scenes, end scene)
 
-//splashScene function (currentScene === 0)?
+//splashScene function
+var splashScene = function() {
+    currentScene = 0;
+    background(84, 156, 130);
+    drawTworekBitmoji(50, 29, 50);
+    drawKinnesBitmoji(345, 47, 80);
+    fill(255, 255, 255);
+    textSize(22);
+    text("Scavenge for Code!", 109, 103, 200, 200);
+    textSize(10);
+    text("By Chloe Tworek", 162, 136, 100, 100);
+    text("and Joshua Kinnes", 158, 148, 100, 100);
+    image(getImage("cute/ChestClosed"), 164, 156, 75, 75);
+    startButton.draw();
+    helpButton.draw();
+};
+
+//helpScene function
 
 //wordScene function
 
@@ -279,10 +316,17 @@ var Field = function(x, y, width, height, image){
 //call each scene drawing function based on scene tracking variable
 
 draw = function() {
-     if(currentScene === 1){
-        
+     if (currentScene === 0) {
+        splashScene();
      }
 };
 
 //mouseClicked function
+mouseClicked = function() {
+    if (currentScene === 0) {
+        startButton.handleMouseClick();
+        helpButton.handleMouseClick();
+    } 
+};
+
 //utilize button/field methods to handle mouse clicks
