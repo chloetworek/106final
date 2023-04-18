@@ -247,6 +247,7 @@ Button.prototype.setScene = function() {
    if(currentScene === 1){
        currentScene = this.scene;
    } else if (currentScene === this.scene){
+       currentScene = 1;
    }
 };
 
