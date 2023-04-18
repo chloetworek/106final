@@ -211,6 +211,7 @@ var drawTworekBitmoji = function (bitmojiX, bitmojiY, h){
 
 //Define global variables (currentScene, questionsAnswered (could store in player object with other information?))
 var currentScene = 0;
+var answerWords = ["variable", "array", "comment", "conditional", "boolean"];
 
 //Insert Kahn button class
 var Button = function(config) {
@@ -241,6 +242,14 @@ Button.prototype.handleMouseClick = function() {
     }
 };
 
+//Create new button method
+Button.prototype.setScene = function() {
+   if(currentScene === 1){
+       currentScene = this.scene;
+   } else if (currentScene === this.scene){
+   }
+};
+
 //Create startButton object
 var startButton = new Button({
     x: 84,
@@ -266,16 +275,47 @@ var helpButton = new Button({
 });
 
 //Define Field class to track text fields for users to input words
-
-var Field = function(x, y, width, height, image){
+var Field = function(x, y, width, height, image, word){
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.image = image;
+    this.text = "";
+    this.button = new Button({
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50,
+        label: " ",
+        onClick: function() {
+            this.setScene();
+        }
+    });
+    this.correct = false;
+    this.button.scene = word + 2;
+};
+Field.prototype.draw = function() {
+    image(this.image, this.x, this.y, this.height, this.height);
+    fill(255, 255, 255);
+    stroke(0, 0, 0);
+    rect(this.x + this.height * 1.25, this.y, this.width, this.height, 5);
+    this.button.x = this.x + this.height * 1.25 + this.width *1.05;
+    this.button.y = this.y;
+    this.button.draw();
+    text(this.text, this.x + this.height *1.25, this.y);
+    strokeWeight(5);
+    line(this.x + this.height * 1.25 + this.width *1.12, this.y + this.height*0.5, this.x + this.height * 1.25 + this.width *1.17, this.y + this.height*0.8);
+    line(this.x + this.height * 1.80 + this.width *1.10, this.y + this.height*0.2, this.x + this.height * 1.25 + this.width *1.17, this.y + this.height*0.8);
+    strokeWeight(1);
 };
 
 //Create Field objects for wordScene
+var word1 = new Field(25, 25, 200, 50, getImage("avatars/mr-pants"), 1);
+var word2 = new Field(25, 100, 200, 50, getImage("avatars/mr-pants-green"), 2);
+var word3 = new Field(25, 175, 200, 50, getImage("avatars/mr-pants-orange"), 3);
+var word4 = new Field(25, 250, 200, 50, getImage("avatars/mr-pants-pink"), 4);
+var word5 = new Field(25, 325, 200, 50, getImage("avatars/mr-pants-purple"), 5);
 
 //Define scene functions (8 minimum, splash, word list, 5+ question scenes, end scene)
 
@@ -297,18 +337,44 @@ var splashScene = function() {
 };
 
 //helpScene function
+var helpScene = function(){
+    background(255, 115, 0);
+};
 
 //wordScene function
+var wordScene = function(){
+    background(123, 171, 227);
+    word1.draw();
+    word2.draw();
+    word3.draw();
+    word4.draw();
+    word5.draw();
+};
 
 //questionOneScene function
+var questionOneScene = function(){
+    background(242, 162, 162);
+};
 
 //questionTwoScene function
+var questionTwoScene = function(){
+    background(26, 0, 255);
+};
 
 //questionThreeScene function
+var questionThreeScene = function(){
+    background(55, 255, 0);
+};
 
 //questionFourScene function
+var questionFourScene = function(){
+    background(77, 0, 255);
+};
 
 //questionFiveScene function
+var questionFiveScene = function(){
+    background(255, 208, 0);
+};
 
 //endScene function
 
@@ -316,9 +382,25 @@ var splashScene = function() {
 //call each scene drawing function based on scene tracking variable
 
 draw = function() {
-     if (currentScene === 0) {
+    if (currentScene === 0) {
         splashScene();
-     }
+    } else if (currentScene === 1) {
+        wordScene();
+    } else if (currentScene === 2) {
+        helpScene();
+    } else if (currentScene === 3) {
+        questionOneScene();
+    } else if (currentScene === 4) {
+        questionTwoScene();
+    } else if (currentScene === 5) {
+        questionThreeScene();
+    } else if (currentScene === 6) {
+        questionFourScene();
+    } else if (currentScene === 7) {
+        questionFiveScene();
+    } else if (currentScene === 8) {
+        
+    }
 };
 
 //mouseClicked function
@@ -326,7 +408,13 @@ mouseClicked = function() {
     if (currentScene === 0) {
         startButton.handleMouseClick();
         helpButton.handleMouseClick();
-    } 
+    } else if (currentScene === 1) {
+        word1.button.handleMouseClick();
+        word2.button.handleMouseClick();
+        word3.button.handleMouseClick();
+        word4.button.handleMouseClick();
+        word5.button.handleMouseClick();
+    }
 };
 
 //utilize button/field methods to handle mouse clicks
