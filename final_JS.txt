@@ -1,3 +1,4 @@
+
 //Insert Kinnes Bitmoji functions
 var drawNeck = function (bitX, bitY, bitSize){
 noStroke();
@@ -275,6 +276,18 @@ var helpButton = new Button({
     }
 });
 
+//Create returnButton object
+var returnButton = new Button({
+    x: 300,
+    y: 15,
+    width: 85,
+    height: 35,
+    label: "Go Back",
+    onClick: function() {
+        currentScene = 1;
+    }
+});
+
 //Define Field class to track text fields for users to input words
 var Field = function(x, y, width, height, image, word){
     this.x = x;
@@ -367,14 +380,74 @@ var questionThreeScene = function(){
     background(55, 255, 0);
 };
 
-//questionFourScene function
-var questionFourScene = function(){
+//conditionalsScene function
+var conditionalsScene = function(){
+    currentScene = 6;
     background(77, 0, 255);
+    fill(255, 255, 255);
+    textSize(20);
+    text("What are conditionals?", 29, 20, 238, 200);
+    fill(0, 255, 208);
+    rect(29, 45, 200, 5);
+    returnButton.draw();
+    //brief definition
+    fill(255, 255, 255);
+    textSize(13);
+    text("Usually appearing as if/then statements, they tell the program when to run a specifc line of code.", 61, 68, 264, 200);
+    //basic outline
+    text("So, IF one statement is true, then certain lines of code will run... ELSE a different line will run.", 61, 142, 200, 200);
+    //question
+    textSize(18);
+    fill(0, 255, 208);
+    text("Practice!", 29, 216, 200, 200);
+    image(getImage("avatars/mr-pants-pink"), 286, 120, 56, 56);
+    image(getImage("avatars/questionmark"), 45, 244, 50, 50);
+    textSize(12);
+    fill(255, 255, 255);
+    text("var x = 5;", 142, 223, 50, 50);
+    text("if (x > 7) {", 142, 240, 100, 50);
+    text('text("You Won!!");', 157, 257, 100, 50);
+    text("} else {", 142, 276, 100, 50);
+    text('text("Whoops, better luck next time")', 157, 294, 200, 50);
+    text("}", 142, 313, 200, 50);
+    fill(0, 255, 208);
+    text("Which phrase is going to show on the screen?", 24, 338, 150, 50);
+    fill(255, 255, 255);
+    rect(182, 338, 191, 35);
+    // correct answer = Whoops, better luck next time
 };
 
-//questionFiveScene function
-var questionFiveScene = function(){
+//booleansScene function
+var booleansScene = function(){
+    currentScene = 7;
     background(255, 208, 0);
+    image(getImage("avatars/mr-pants-purple"), 23, 231, 50, 50);
+    returnButton.draw();
+    fill(18, 86, 224);
+    textSize(20);
+    text("What is a boolean?", 18, 24, 200, 100);
+    rect(18, 51, 175, 5);
+    //brief definition
+    textSize(13);
+    fill(0, 0, 0);
+    text("These are a specific type of data in code that can only have one of two different values. TRUE or FALSE", 61, 68, 264, 200);
+    text("It's what we can use to evaluate expressions, like 5 < 7, and can come in useful when making comparisons. Directing the program to do one thing when the boolean is true, and maybe stopping this action when it is set to false.", 61, 136, 314, 200);
+    //question
+    textSize(20);
+    fill(0, 132, 255);
+    text("Practice!", 86, 248, 200, 200);
+    textSize(12);
+    fill(18, 86, 224);
+    text("At the start of your code, you set a global variable...", 24, 291, 200, 200);
+    text("var stillPlaying = true;", 24, 333, 200, 200);
+    text("What will you change that value to if you want the game to end?", 24, 358, 200, 200);
+    fill(0, 0, 0);
+    image(getImage("space/star"), 217, 312, 50, 50);
+    text('HINT! Add a trusty " ; " at the end!', 266, 329, 108, 200);
+    text("stillPlaying =", 229, 291, 200, 200);
+    fill(255, 255, 255);
+    rect(305, 286, 80, 25);
+    //correct answer = false;
 };
 
 //endScene function
@@ -396,9 +469,9 @@ draw = function() {
     } else if (currentScene === 5) {
         questionThreeScene();
     } else if (currentScene === 6) {
-        questionFourScene();
+        conditionalsScene();
     } else if (currentScene === 7) {
-        questionFiveScene();
+        booleansScene();
     } else if (currentScene === 8) {
         
     }
@@ -409,12 +482,16 @@ mouseClicked = function() {
     if (currentScene === 0) {
         startButton.handleMouseClick();
         helpButton.handleMouseClick();
-    } else if (currentScene === 1) {
+    }
+    if (currentScene === 1) {
         word1.button.handleMouseClick();
         word2.button.handleMouseClick();
         word3.button.handleMouseClick();
         word4.button.handleMouseClick();
         word5.button.handleMouseClick();
+    }
+    if (currentScene === 6 || currentScene === 7) {
+        returnButton.handleMouseClick();
     }
 };
 
