@@ -211,7 +211,10 @@ var drawTworekBitmoji = function (bitmojiX, bitmojiY, h){
 
 //Define global variables (currentScene, questionsAnswered (could store in player object with other information?))
 var currentScene = 0;
-var answerWords = ["variable", "array", "comment", "conditional", "boolean"];
+var answerWords = ["VARIABLE", "ARRAY", "COMMENT", "CONDITIONAL", "BOOLEAN"];
+var wordImages = [getImage("avatars/mr-pants"), getImage("avatars/mr-pants-green"), getImage("avatars/mr-pants-orange"), getImage("avatars/mr-pants-pink"), getImage("avatars/mr-pants-purple")];
+var selectedField;
+var pageFields = [];
 
 //Insert Kahn button class
 var Button = function(config) {
@@ -251,7 +254,7 @@ Button.prototype.setScene = function() {
    }
 };
 
-//Create startButton object
+//Create Button objects
 var startButton = new Button({
     x: 84,
     y: 264,
@@ -262,8 +265,6 @@ var startButton = new Button({
         currentScene = 1;
     }
 });
-
-//Create helpButton object
 var helpButton = new Button({
     x: 250,
     y: 264,
@@ -275,14 +276,58 @@ var helpButton = new Button({
     }
 });
 
+//Create returnButton object
+var returnButton = new Button({
+    x: 227,
+    y: 359,
+    width: 102,
+    height: 35,
+    label: "GO BACK",
+    onClick: function() {
+        currentScene = 1;
+    }
+});
+
+//Define function to determine which letter has been typed
+var letterSelect = function(){
+    var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+  for (var i = 65; i <= 90; i++){
+    if (keyCode === i){
+        return letters[i-65];
+    }
+  }
+    return "";
+};
+
+var drawCheck = function(x, y){
+    strokeWeight(5);
+    line(x, y, x + 15, y + 15);
+    line(x + 15, y + 15, x + 35, y - 25);
+    strokeWeight(1);
+};
+var drawArrow = function(x, y, w, h){
+    strokeWeight(5);
+    fill(255, 195, 43);
+    rect(x + w*0.1, y + h/4, w/2, h/2);
+    triangle(x + w/2, y+h*0.1, x + w/2 , y+h*0.9, x+w*0.9, y+h/2);
+    noStroke();
+    rect(x + w*0.2, y + h/3.2, w/2.75, h/2.5);
+    strokeWeight(1);
+    
+};
+
 //Define Field class to track text fields for users to input words
-var Field = function(x, y, width, height, image, word){
+var Field = function(x, y, width, height, word, image, scene){
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.image = image;
     this.text = "";
+    this.answer = word;
+    this.color = color(255, 255, 255);
+    this.complete = false;
+    this.correct = false;
     this.button = new Button({
         x: 0,
         y: 0,
@@ -293,36 +338,64 @@ var Field = function(x, y, width, height, image, word){
             this.setScene();
         }
     });
-    this.correct = false;
-    this.button.scene = word + 2;
+    this.button.scene = scene + 2;
 };
 Field.prototype.draw = function() {
-    image(this.image, this.x, this.y, this.height, this.height);
-    fill(255, 255, 255);
+    if (this.correct){
+        fill(70, 252, 38);
+    }else if (this.isMouseInside() && selectedField !== this){
+        fill(250, 160, 160);
+    }else{
+        fill(this.color);
+    }
     stroke(0, 0, 0);
-    rect(this.x + this.height * 1.25, this.y, this.width, this.height, 5);
-    this.button.x = this.x + this.height * 1.25 + this.width *1.05;
-    this.button.y = this.y;
-    this.button.draw();
-    text(this.text, this.x + this.height *1.25, this.y);
-    strokeWeight(5);
-    line(this.x + this.height * 1.25 + this.width *1.12, this.y + this.height*0.5, this.x + this.height * 1.25 + this.width *1.17, this.y + this.height*0.8);
-    line(this.x + this.height * 1.80 + this.width *1.10, this.y + this.height*0.2, this.x + this.height * 1.25 + this.width *1.17, this.y + this.height*0.8);
-    strokeWeight(1);
+    rect(this.x, this.y, this.width, this.height, 5);
+    if(currentScene === 1){
+        image(this.image, this.x - this.width * 0.3, this.y, this.height, this.height);
+        this.button.x = this.x + this.width *1.05;
+        this.button.y = this.y;
+        this.button.draw();
+    }
+    text(this.text, this.x, this.y, this.width, this.height);
+    if(this.correct){
+        drawCheck(this.x + this.width * 1.09, this.y + this.height/1.65);
+    } else {
+        drawArrow(this.button.x, this.button.y, this.button.width, this.button.height);
+    }
+};
+Field.prototype.keyPress = function(){
+    this.text += letterSelect();
+    if(keyCode === 8){
+        this.text = this.text.slice(0, -1);
+    }
+};
+Field.prototype.isMouseInside = function() {
+    return mouseX > this.x &&
+           mouseX < (this.x + this.width) &&
+           mouseY > this.y &&
+           mouseY < (this.y + this.height);
+};
+Field.prototype.checkCorrect = function(){
+    if(this.answer === this.text){
+        this.correct = true;
+        return true;
+    }
 };
 
 //Create Field objects for wordScene
-var word1 = new Field(25, 25, 200, 50, getImage("avatars/mr-pants"), 1);
-var word2 = new Field(25, 100, 200, 50, getImage("avatars/mr-pants-green"), 2);
-var word3 = new Field(25, 175, 200, 50, getImage("avatars/mr-pants-orange"), 3);
-var word4 = new Field(25, 250, 200, 50, getImage("avatars/mr-pants-pink"), 4);
-var word5 = new Field(25, 325, 200, 50, getImage("avatars/mr-pants-purple"), 5);
+var variableWord = new Field(100, 25, 200, 50, answerWords[0], wordImages[0], 1);
+var arrayWord = new Field(100, 100, 200, 50, answerWords[1], wordImages[1], 2);
+var commentWord = new Field(100, 175, 200, 50, answerWords[2], wordImages[2], 3);
+var conditionalWord = new Field(100, 250, 200, 50, answerWords[3], wordImages[3], 4);
+var booleanWord = new Field(100, 325, 200, 50, answerWords[4], wordImages[4], 5);
+
+//Create field objects for gameplay
+var conditionalsQuestion = new Field(182, 317, 191, 35);
 
 //Define scene functions (8 minimum, splash, word list, 5+ question scenes, end scene)
 
 //splashScene function
 var splashScene = function() {
-    currentScene = 0;
     background(84, 156, 130);
     drawTworekBitmoji(50, 29, 50);
     drawKinnesBitmoji(345, 47, 80);
@@ -345,43 +418,106 @@ var helpScene = function(){
 //wordScene function
 var wordScene = function(){
     background(123, 171, 227);
-    word1.draw();
-    word2.draw();
-    word3.draw();
-    word4.draw();
-    word5.draw();
+    pageFields = [variableWord, arrayWord, commentWord, conditionalWord, booleanWord];
+    variableWord.draw();
+    arrayWord.draw();
+    commentWord.draw();
+    conditionalWord.draw();
+    booleanWord.draw();
 };
 
 //questionOneScene function
 var questionOneScene = function(){
     background(242, 162, 162);
+    returnButton.draw();
 };
 
 //questionTwoScene function
 var questionTwoScene = function(){
     background(26, 0, 255);
+    returnButton.draw();
 };
 
 //questionThreeScene function
 var questionThreeScene = function(){
     background(55, 255, 0);
+    returnButton.draw();
 };
 
-//questionFourScene function
-var questionFourScene = function(){
+//conditionalsScene function
+var conditionalsScene = function(){
+    pageFields = [conditionalsQuestion];
     background(77, 0, 255);
+    fill(255, 255, 255);
+    textSize(20);
+    text("What are conditionals?", 29, 20, 238, 200);
+    fill(0, 255, 208);
+    rect(29, 45, 200, 5);
+    returnButton.draw();
+    //brief definition
+    fill(255, 255, 255);
+    textSize(13);
+    text("Usually appearing as if/then statements, they tell the program when to run a specifc line of code.", 61, 68, 264, 200);
+    //basic outline
+    text("So, IF one statement is true, then certain lines of code will run... ELSE a different line will run.", 61, 142, 200, 200);
+    //question
+    textSize(18);
+    fill(0, 255, 208);
+    text("Practice!", 29, 216, 200, 200);
+    image(wordImages[3], 286, 120, 56, 56);
+    image(getImage("avatars/questionmark"), 45, 244, 50, 50);
+    textSize(12);
+    fill(255, 255, 255);
+    text("var x = 5;", 142, 223, 50, 50);
+    text("if (x > 7) {", 142, 240, 100, 50);
+    text('text("You Won!!");', 157, 257, 100, 50);
+    text("} else {", 142, 276, 100, 50);
+    text('text("Whoops, better luck next time")', 157, 294, 200, 50);
+    text("}", 142, 313, 200, 50);
+    fill(0, 255, 208);
+    text("Which phrase is going to show on the screen?", 24, 338, 150, 50);
+    fill(255, 255, 255);
+    conditionalsQuestion.draw();
+    //rect(182, 317, 191, 35);
+    // correct answer = Whoops, better luck next time
 };
 
-//questionFiveScene function
-var questionFiveScene = function(){
+//booleansScene function
+var booleansScene = function(){
     background(255, 208, 0);
+    image(wordImages[4], 23, 231, 50, 50);
+    returnButton.draw();
+    fill(18, 86, 224);
+    textSize(20);
+    text("What is a boolean?", 18, 24, 200, 100);
+    rect(18, 51, 175, 5);
+    //brief definition
+    textSize(13);
+    fill(0, 0, 0);
+    text("These are a specific type of data in code that can only have one of two different values. TRUE or FALSE", 61, 68, 264, 200);
+    text("It's what we can use to evaluate expressions, like 5 < 7, and can come in useful when making comparisons. Directing the program to do one thing when the boolean is true, and maybe stopping this action when it is set to false.", 61, 136, 314, 200);
+    //question
+    textSize(20);
+    fill(0, 132, 255);
+    text("Practice!", 86, 248, 200, 200);
+    textSize(12);
+    fill(18, 86, 224);
+    text("At the start of your code, you set a global variable...", 24, 291, 200, 200);
+    text("var stillPlaying = true;", 24, 333, 200, 200);
+    text("What will you change that value to if you want the game to end?", 24, 358, 200, 200);
+    fill(0, 0, 0);
+    image(getImage("space/star"), 217, 308, 50, 50);
+    text('HINT! Add a trusty " ; " at the end!', 266, 319, 108, 200);
+    text("stillPlaying =", 229, 291, 200, 200);
+    fill(255, 255, 255);
+    rect(305, 286, 80, 25);
+    //correct answer = false;
 };
 
 //endScene function
 
 //draw function
 //call each scene drawing function based on scene tracking variable
-
 draw = function() {
     if (currentScene === 0) {
         splashScene();
@@ -396,9 +532,9 @@ draw = function() {
     } else if (currentScene === 5) {
         questionThreeScene();
     } else if (currentScene === 6) {
-        questionFourScene();
+        conditionalsScene();
     } else if (currentScene === 7) {
-        questionFiveScene();
+        booleansScene();
     } else if (currentScene === 8) {
         
     }
@@ -406,16 +542,30 @@ draw = function() {
 
 //mouseClicked function
 mouseClicked = function() {
+    returnButton.handleMouseClick();
     if (currentScene === 0) {
         startButton.handleMouseClick();
         helpButton.handleMouseClick();
     } else if (currentScene === 1) {
-        word1.button.handleMouseClick();
-        word2.button.handleMouseClick();
-        word3.button.handleMouseClick();
-        word4.button.handleMouseClick();
-        word5.button.handleMouseClick();
+        variableWord.button.handleMouseClick();
+        arrayWord.button.handleMouseClick();
+        conditionalWord.button.handleMouseClick();
+        commentWord.button.handleMouseClick();
+        booleanWord.button.handleMouseClick();
     }
+    for(var i = 0; i < pageFields.length; i++){
+        pageFields[i].checkCorrect();
+        if(pageFields[i].isMouseInside()){
+            pageFields[i].color = color(74, 210, 255);
+            selectedField = pageFields[i];
+        } else {
+            pageFields[i].color = color(255, 255, 255);
+        }
+    }
+};
+
+keyPressed = function() {
+    selectedField.keyPress();
 };
 
 //utilize button/field methods to handle mouse clicks
