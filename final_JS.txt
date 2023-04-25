@@ -288,6 +288,18 @@ var returnButton = new Button({
     }
 });
 
+//Create submitButton object
+var submitButton = new Button({
+    x: 70, 
+    y: 359,
+    width: 102,
+    height: 35,
+    label: "SUBMIT",
+    onClick: function() {
+        currentScene = 1;
+    }
+});
+
 //Define function to determine which letter has been typed
 var letterSelect = function(){
     var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
@@ -390,7 +402,9 @@ var conditionalWord = new Field(100, 250, 200, 50, answerWords[3], wordImages[3]
 var booleanWord = new Field(100, 325, 200, 50, answerWords[4], wordImages[4], 5);
 
 //Create field objects for gameplay
+var arraysQuestion = new Field(182, 317, 191, 35);
 var conditionalsQuestion = new Field(182, 317, 191, 35);
+var booleanQuestion = new Field(305, 286, 80, 25);
 
 //Define scene functions (8 minimum, splash, word list, 5+ question scenes, end scene)
 
@@ -430,18 +444,46 @@ var wordScene = function(){
 var questionOneScene = function(){
     background(242, 162, 162);
     returnButton.draw();
+    submitButton.draw();
 };
 
-//questionTwoScene function
-var questionTwoScene = function(){
+//arraysScene function
+var arraysScene = function(){
+    pageFields = [arraysQuestion];
     background(26, 0, 255);
+    image(getImage("avatars/questionmark"), 334, 20, 50, 58);
+    image(getImage("avatars/avatar-team"), 321, 212, 63, 45);
+    textSize(20);
+    fill(99, 237, 223);
+    text("What is an array?", 36, 20, 200, 200);
+    fill(255, 255, 255);
+    rect(34, 46, 161, 5);
     returnButton.draw();
+    submitButton.draw();
+    //brief definition
+    fill(99, 237, 223);
+    textSize(13);
+    text("This is a set of data in coding that allows you to store many values and elements in just one variable. You can use it to group names, words, numbers, etc.", 50, 68, 282, 200);
+    fill(255, 255, 255);
+    text("When organized in this fashion, you will be able to pull out a specific value by referring to the index of the array it is located in. The indexes start at 0, for the first positon, and go up by 1 for each of the next values.", 28, 153, 361, 200);
+    //question
+    textSize(18);
+    fill(0, 255, 208);
+    text("Practice!", 65, 236, 198, 200);
+    image(wordImages[2], 7, 234, 50, 50);
+    textSize(12);
+    text("When looking at the given array, you decide to pull out the value at index 2... what would this be?", 66, 264, 271, 200);
+    fill(255, 255, 255);
+    text('var topSports = ["soccer", "fieldhockey", "football", "basketball"];', 19, 304, 191, 200);
+    arraysQuestion.draw();
+    //correct answer = football
 };
 
 //questionThreeScene function
 var questionThreeScene = function(){
     background(55, 255, 0);
     returnButton.draw();
+    submitButton.draw();
 };
 
 //conditionalsScene function
@@ -454,6 +496,7 @@ var conditionalsScene = function(){
     fill(0, 255, 208);
     rect(29, 45, 200, 5);
     returnButton.draw();
+    submitButton.draw();
     //brief definition
     fill(255, 255, 255);
     textSize(13);
@@ -468,50 +511,52 @@ var conditionalsScene = function(){
     image(getImage("avatars/questionmark"), 45, 244, 50, 50);
     textSize(12);
     fill(255, 255, 255);
-    text("var x = 5;", 142, 223, 50, 50);
-    text("if (x > 7) {", 142, 240, 100, 50);
-    text('text("You Won!!");', 157, 257, 100, 50);
-    text("} else {", 142, 276, 100, 50);
-    text('text("Whoops, better luck next time")', 157, 294, 200, 50);
-    text("}", 142, 313, 200, 50);
+    text("var x = 5;", 142, 219, 50, 50);
+    text("if (x > 7) {", 142, 235, 100, 50);
+    text('text("You Won!!");', 157, 253, 100, 50);
+    text("} else {", 142, 269, 100, 50);
+    text('text("Whoops, better luck next time")', 157, 288, 200, 50);
+    text("}", 142, 305, 200, 50);
     fill(0, 255, 208);
-    text("Which phrase is going to show on the screen?", 24, 338, 150, 50);
+    text("Which phrase is going to show on the screen?", 24, 320, 150, 50);
     fill(255, 255, 255);
     conditionalsQuestion.draw();
-    //rect(182, 317, 191, 35);
-    // correct answer = Whoops, better luck next time
+    // correct answer = Whoops better luck next time
 };
 
 //booleansScene function
 var booleansScene = function(){
+    pageFields = [booleanQuestion];
     background(255, 208, 0);
-    image(wordImages[4], 23, 231, 50, 50);
+    image(wordImages[4], 7, 197, 50, 50);
     returnButton.draw();
+    submitButton.draw();
     fill(18, 86, 224);
     textSize(20);
-    text("What is a boolean?", 18, 24, 200, 100);
-    rect(18, 51, 175, 5);
+    text("What is a boolean?", 18, 15, 200, 100);
+    rect(18, 42, 175, 5);
     //brief definition
     textSize(13);
     fill(0, 0, 0);
-    text("These are a specific type of data in code that can only have one of two different values. TRUE or FALSE", 61, 68, 264, 200);
-    text("It's what we can use to evaluate expressions, like 5 < 7, and can come in useful when making comparisons. Directing the program to do one thing when the boolean is true, and maybe stopping this action when it is set to false.", 61, 136, 314, 200);
+    text("These are a specific type of data in code that can only have one of two different values. TRUE or FALSE", 61, 56, 264, 200);
+    text("It's what we can use to evaluate expressions, like 5 < 7, and can come in useful when making comparisons. Directing the program to do one thing when the boolean is true, and maybe stopping this action when it is set to false.", 61, 119, 314, 200);
     //question
     textSize(20);
     fill(0, 132, 255);
-    text("Practice!", 86, 248, 200, 200);
+    text("Practice!", 72, 224, 200, 200);
     textSize(12);
     fill(18, 86, 224);
-    text("At the start of your code, you set a global variable...", 24, 291, 200, 200);
-    text("var stillPlaying = true;", 24, 333, 200, 200);
-    text("What will you change that value to if you want the game to end?", 24, 358, 200, 200);
+    text("At the start of your code, you set a global variable...", 24, 260, 200, 200);
+    text("var stillPlaying = true;", 44, 299, 200, 200);
+    text("What will you change that value to if you want the game to end?", 24, 320, 200, 200);
     fill(0, 0, 0);
-    image(getImage("space/star"), 217, 308, 50, 50);
-    text('HINT! Add a trusty " ; " at the end!', 266, 319, 108, 200);
+    image(getImage("space/star"), 217, 303, 50, 50);
     text("stillPlaying =", 229, 291, 200, 200);
+    text(";", 386, 291, 200, 200);
     fill(255, 255, 255);
-    rect(305, 286, 80, 25);
-    //correct answer = false;
+    booleanQuestion.draw();
+    //rect(305, 286, 80, 25);
+    //correct answer = false
 };
 
 //endScene function
@@ -528,7 +573,7 @@ draw = function() {
     } else if (currentScene === 3) {
         questionOneScene();
     } else if (currentScene === 4) {
-        questionTwoScene();
+        arraysScene();
     } else if (currentScene === 5) {
         questionThreeScene();
     } else if (currentScene === 6) {
@@ -543,6 +588,7 @@ draw = function() {
 //mouseClicked function
 mouseClicked = function() {
     returnButton.handleMouseClick();
+    submitButton.handleMouseClick();
     if (currentScene === 0) {
         startButton.handleMouseClick();
         helpButton.handleMouseClick();
