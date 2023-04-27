@@ -215,6 +215,8 @@ var answerWords = ["VARIABLE", "ARRAY", "COMMENT", "CONDITIONAL", "BOOLEAN"];
 var wordImages = [getImage("avatars/mr-pants"), getImage("avatars/mr-pants-green"), getImage("avatars/mr-pants-orange"), getImage("avatars/mr-pants-pink"), getImage("avatars/mr-pants-purple")];
 var selectedField;
 var pageFields = [];
+var wordFields = [];
+var popUp = false;
 
 //Insert Kahn button class
 var Button = function(config) {
@@ -245,7 +247,7 @@ Button.prototype.handleMouseClick = function() {
     }
 };
 
-//Create new button method
+//Create new button method to change scenes
 Button.prototype.setScene = function() {
    if(currentScene === 1){
        currentScene = this.scene;
@@ -275,8 +277,6 @@ var helpButton = new Button({
         currentScene = 2;
     }
 });
-
-//Create returnButton object
 var returnButton = new Button({
     x: 227,
     y: 359,
@@ -284,19 +284,21 @@ var returnButton = new Button({
     height: 35,
     label: "GO BACK",
     onClick: function() {
-        currentScene = 1;
+        if(currentScene === 2){
+            currentScene = 0;
+        }else{
+            currentScene = 1;
+        }
     }
 });
-
-//Create submitButton object
-var submitButton = new Button({
-    x: 70, 
-    y: 359,
-    width: 102,
+var againButton = new Button({
+    x: 150,
+    y: 215,
+    width: 100,
     height: 35,
-    label: "SUBMIT",
+    label: "Try Again",
     onClick: function() {
-        currentScene = 1;
+        popUp = false;
     }
 });
 
@@ -311,6 +313,7 @@ var letterSelect = function(){
     return "";
 };
 
+//Define check and arrow functions for field buttons
 var drawCheck = function(x, y){
     strokeWeight(5);
     line(x, y, x + 15, y + 15);
@@ -334,7 +337,7 @@ var Field = function(x, y, width, height, word, image, scene){
     this.y = y;
     this.width = width;
     this.height = height;
-    this.image = image;
+    this.image = image || 0;
     this.text = "";
     this.answer = word;
     this.color = color(255, 255, 255);
@@ -347,13 +350,15 @@ var Field = function(x, y, width, height, word, image, scene){
         height: 50,
         label: " ",
         onClick: function() {
-            this.setScene();
+            if(wordFields[this.scene-3].correct){
+                this.setScene();
+            }
         }
     });
-    this.button.scene = scene + 2;
+    this.button.scene = scene + 2 || 0;
 };
 Field.prototype.draw = function() {
-    if (this.correct){
+    if (this.complete){
         fill(70, 252, 38);
     }else if (this.isMouseInside() && selectedField !== this){
         fill(250, 160, 160);
@@ -367,13 +372,14 @@ Field.prototype.draw = function() {
         this.button.x = this.x + this.width *1.05;
         this.button.y = this.y;
         this.button.draw();
+        if(this.complete){
+            drawCheck(this.x + this.width * 1.09, this.y + this.height/1.65);
+        } else {
+            drawArrow(this.button.x, this.button.y, this.button.width, this.button.height);
+        }
     }
+    fill(0, 0, 0);
     text(this.text, this.x, this.y, this.width, this.height);
-    if(this.correct){
-        drawCheck(this.x + this.width * 1.09, this.y + this.height/1.65);
-    } else {
-        drawArrow(this.button.x, this.button.y, this.button.width, this.button.height);
-    }
 };
 Field.prototype.keyPress = function(){
     this.text += letterSelect();
@@ -394,21 +400,49 @@ Field.prototype.checkCorrect = function(){
     }
 };
 
-//Create Field objects for wordScene
+//Create Field objects for wordScene and array containing all fields
 var variableWord = new Field(100, 25, 200, 50, answerWords[0], wordImages[0], 1);
 var arrayWord = new Field(100, 100, 200, 50, answerWords[1], wordImages[1], 2);
 var commentWord = new Field(100, 175, 200, 50, answerWords[2], wordImages[2], 3);
 var conditionalWord = new Field(100, 250, 200, 50, answerWords[3], wordImages[3], 4);
 var booleanWord = new Field(100, 325, 200, 50, answerWords[4], wordImages[4], 5);
+wordFields = [variableWord, arrayWord, commentWord, conditionalWord, booleanWord];
+
+var drawPopUp = function(){
+    strokeWeight(2);
+    stroke(0, 0, 0);
+    fill(255, 255, 255);
+    rect(100, 118, 200, 150);
+    fill(0, 0, 0);
+    text("That wasn't quite right!", 153, 145, 120, 100);
+    strokeWeight(1);
+    againButton.draw();
+};
+
+//Create submitButton object
+var submitButton = new Button({
+    x: 70, 
+    y: 359,
+    width: 102,
+    height: 35,
+    label: "SUBMIT",
+    onClick: function() {
+        if(pageFields[0].correct){
+            var sceneCheck = currentScene;
+            currentScene = 1;
+            wordFields[sceneCheck - 3].complete = true;
+        } else {
+            popUp = true;
+        }
+    }
+});
 
 //Create field objects for gameplay
-var arraysQuestion = new Field(182, 317, 191, 35);
-var conditionalsQuestion = new Field(182, 317, 191, 35);
-var booleanQuestion = new Field(305, 286, 80, 25);
+var arraysQuestion = new Field(182, 317, 191, 35, "FOOTBALL");
+var conditionalsQuestion = new Field(182, 317, 191, 35, "TEST");
+var booleanQuestion = new Field(305, 286, 80, 25, "FALSE");
 
 //Define scene functions (8 minimum, splash, word list, 5+ question scenes, end scene)
-
-//splashScene function
 var splashScene = function() {
     background(84, 156, 130);
     drawTworekBitmoji(50, 29, 50);
@@ -423,31 +457,45 @@ var splashScene = function() {
     startButton.draw();
     helpButton.draw();
 };
-
-//helpScene function
 var helpScene = function(){
     background(255, 115, 0);
+    returnButton.draw();
+    textSize(30);
+    text("HOW TO PLAY", 100, 25, 250, 100);
+    stroke(0, 0, 0);
+    line(25, 65, 375, 65);
+    textSize(15);
+    text("1. Hit START and pay attention to the 5 images shown on screen.", 40, 80, 325, 100);
+    text("2. Walk around the union and find the 5 posters with the images and words.", 40, 129, 325, 100);
+    text("3. When you find a poster, type the word in next to the image and hit the arrow button.", 40, 178, 325, 100);
+    text("4. Answer the question on screen and hit SUBMIT", 40, 226, 339, 100);
+    text("5. Once you've answered all the questions, come back to the table and show us all 5 check marks for a prize!", 40, 255, 339, 100);
+    drawTworekBitmoji(79, 347, 45);
+    drawKinnesBitmoji(152, 355, 75);
 };
-
-//wordScene function
 var wordScene = function(){
     background(123, 171, 227);
+    drawTworekBitmoji(23, 24, 36);
+    drawKinnesBitmoji(377, 351, 76);
     pageFields = [variableWord, arrayWord, commentWord, conditionalWord, booleanWord];
-    variableWord.draw();
-    arrayWord.draw();
-    commentWord.draw();
-    conditionalWord.draw();
-    booleanWord.draw();
+    for(var i = 0; i < wordFields.length; i++){
+        wordFields[i].draw();
+    }
+    var allCorrect = 0;
+    for (var i = 0; i < pageFields.length; i++){
+        if (pageFields[i].complete){
+            allCorrect++;
+        }
+    }
+    if (allCorrect === pageFields.length){
+        currentScene = 8;
+    }
 };
-
-//questionOneScene function
 var questionOneScene = function(){
     background(242, 162, 162);
     returnButton.draw();
     submitButton.draw();
 };
-
-//arraysScene function
 var arraysScene = function(){
     pageFields = [arraysQuestion];
     background(26, 0, 255);
@@ -478,15 +526,11 @@ var arraysScene = function(){
     arraysQuestion.draw();
     //correct answer = football
 };
-
-//questionThreeScene function
 var questionThreeScene = function(){
     background(55, 255, 0);
     returnButton.draw();
     submitButton.draw();
 };
-
-//conditionalsScene function
 var conditionalsScene = function(){
     pageFields = [conditionalsQuestion];
     background(77, 0, 255);
@@ -523,8 +567,6 @@ var conditionalsScene = function(){
     conditionalsQuestion.draw();
     // correct answer = Whoops better luck next time
 };
-
-//booleansScene function
 var booleansScene = function(){
     pageFields = [booleanQuestion];
     background(255, 208, 0);
@@ -558,13 +600,16 @@ var booleansScene = function(){
     //rect(305, 286, 80, 25);
     //correct answer = false
 };
-
-//endScene function
+var endScene = function(){
+    background(247, 0, 255);
+};
 
 //draw function
 //call each scene drawing function based on scene tracking variable
 draw = function() {
-    if (currentScene === 0) {
+    if(popUp){
+        drawPopUp();
+    } else if (currentScene === 0) {
         splashScene();
     } else if (currentScene === 1) {
         wordScene();
@@ -581,24 +626,12 @@ draw = function() {
     } else if (currentScene === 7) {
         booleansScene();
     } else if (currentScene === 8) {
-        
+        endScene();
     }
 };
 
 //mouseClicked function
 mouseClicked = function() {
-    returnButton.handleMouseClick();
-    submitButton.handleMouseClick();
-    if (currentScene === 0) {
-        startButton.handleMouseClick();
-        helpButton.handleMouseClick();
-    } else if (currentScene === 1) {
-        variableWord.button.handleMouseClick();
-        arrayWord.button.handleMouseClick();
-        conditionalWord.button.handleMouseClick();
-        commentWord.button.handleMouseClick();
-        booleanWord.button.handleMouseClick();
-    }
     for(var i = 0; i < pageFields.length; i++){
         pageFields[i].checkCorrect();
         if(pageFields[i].isMouseInside()){
@@ -608,10 +641,19 @@ mouseClicked = function() {
             pageFields[i].color = color(255, 255, 255);
         }
     }
+    againButton.handleMouseClick();
+    returnButton.handleMouseClick();
+    submitButton.handleMouseClick();
+    if (currentScene === 0) {
+        startButton.handleMouseClick();
+        helpButton.handleMouseClick();
+    } else if (currentScene === 1) {
+        for(var i = 0; i < wordFields.length; i++){
+            wordFields[i].button.handleMouseClick();
+        }
+    }
 };
 
 keyPressed = function() {
     selectedField.keyPress();
 };
-
-//utilize button/field methods to handle mouse clicks
