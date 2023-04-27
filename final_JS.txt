@@ -438,9 +438,10 @@ var submitButton = new Button({
 });
 
 //Create field objects for gameplay
+var variablesQuestion = new Field(222, 276, 111, 30, "22");
 var arraysQuestion = new Field(182, 317, 191, 35, "FOOTBALL");
-var conditionalsQuestion = new Field(182, 317, 191, 35, "TEST");
-var booleanQuestion = new Field(305, 286, 80, 25, "FALSE");
+var conditionalsQuestion = new Field(182, 317, 191, 35, "WHOOPS BETTER LUCK NEXT TIME");
+var booleansQuestion = new Field(305, 286, 80, 25, "FALSE");
 
 //Define scene functions (8 minimum, splash, word list, 5+ question scenes, end scene)
 var splashScene = function() {
@@ -491,10 +492,38 @@ var wordScene = function(){
         currentScene = 8;
     }
 };
-var questionOneScene = function(){
+var variablesScene = function(){
+    pageFields = [variablesQuestion];
     background(242, 162, 162);
+    textSize(20);
+    fill(214, 64, 64);
+    text("What are variables?", 36, 20, 200, 200);
+    fill(255, 222, 209);
+    rect(34, 46, 182, 5);
     returnButton.draw();
     submitButton.draw();
+    //brief definition
+    fill(156, 76, 114);
+    textSize(13);
+    text("These allow you to store a value under a certain name, which can then be changed as you move through your code. It is written as var _____ = _____;", 50, 66, 321, 200);
+    text("So, instead of referencing a hard coded number, you can just use the name of the variable.", 50, 130, 213, 200);
+    image(wordImages[0], 283, 118, 70, 70);
+    //question
+    textSize(18);
+    fill(214, 64, 64);
+    text("Practice!", 33, 193, 198, 200);
+    textSize(12);
+    fill(156, 76, 114);
+    text('Given the following lines of code, what would the value of "sum" be?', 33, 228, 297, 200);
+    fill(122, 12, 12);
+    image(getImage("space/plus"), 156, 263, 20, 20);
+    image(getImage("space/minus"), 174, 284, 20, 20);
+    image(getImage("avatars/questionmark"), 181, 269, 20, 20);
+    text("var x = 9;", 55, 268, 198, 200);
+    text("var y = 13;", 55, 286, 198, 200);
+    text("var sum = x + y;", 55, 304, 198, 200);
+    variablesQuestion.draw();
+    //correct answer = 22
 };
 var arraysScene = function(){
     pageFields = [arraysQuestion];
@@ -518,7 +547,7 @@ var arraysScene = function(){
     textSize(18);
     fill(0, 255, 208);
     text("Practice!", 65, 236, 198, 200);
-    image(wordImages[2], 7, 234, 50, 50);
+    image(wordImages[1], 7, 234, 50, 50);
     textSize(12);
     text("When looking at the given array, you decide to pull out the value at index 2... what would this be?", 66, 264, 271, 200);
     fill(255, 255, 255);
@@ -526,7 +555,7 @@ var arraysScene = function(){
     arraysQuestion.draw();
     //correct answer = football
 };
-var questionThreeScene = function(){
+var commentsScene = function(){
     background(55, 255, 0);
     returnButton.draw();
     submitButton.draw();
@@ -559,7 +588,7 @@ var conditionalsScene = function(){
     text("if (x > 7) {", 142, 235, 100, 50);
     text('text("You Won!!");', 157, 253, 100, 50);
     text("} else {", 142, 269, 100, 50);
-    text('text("Whoops, better luck next time")', 157, 288, 200, 50);
+    text('text("Whoops better luck next time")', 157, 288, 200, 50);
     text("}", 142, 305, 200, 50);
     fill(0, 255, 208);
     text("Which phrase is going to show on the screen?", 24, 320, 150, 50);
@@ -568,7 +597,7 @@ var conditionalsScene = function(){
     // correct answer = Whoops better luck next time
 };
 var booleansScene = function(){
-    pageFields = [booleanQuestion];
+    pageFields = [booleansQuestion];
     background(255, 208, 0);
     image(wordImages[4], 7, 197, 50, 50);
     returnButton.draw();
@@ -596,7 +625,7 @@ var booleansScene = function(){
     text("stillPlaying =", 229, 291, 200, 200);
     text(";", 386, 291, 200, 200);
     fill(255, 255, 255);
-    booleanQuestion.draw();
+    booleansQuestion.draw();
     //rect(305, 286, 80, 25);
     //correct answer = false
 };
@@ -616,11 +645,11 @@ draw = function() {
     } else if (currentScene === 2) {
         helpScene();
     } else if (currentScene === 3) {
-        questionOneScene();
+        variablesScene();
     } else if (currentScene === 4) {
         arraysScene();
     } else if (currentScene === 5) {
-        questionThreeScene();
+        commentsScene();
     } else if (currentScene === 6) {
         conditionalsScene();
     } else if (currentScene === 7) {
