@@ -209,7 +209,7 @@ var drawTworekBitmoji = function (bitmojiX, bitmojiY, h){
     drawBitmojiHeadband(bitmojiX, bitmojiY, h);
 };
 
-//Define global variables (currentScene, questionsAnswered (could store in player object with other information?))
+//Define global variables
 var currentScene = 0;
 var answerWords = ["VARIABLE", "ARRAY", "COMMENT", "CONDITIONAL", "BOOLEAN"];
 var wordImages = [getImage("avatars/mr-pants"), getImage("avatars/mr-pants-green"), getImage("avatars/mr-pants-orange"), getImage("avatars/mr-pants-pink"), getImage("avatars/mr-pants-purple")];
@@ -217,6 +217,7 @@ var selectedField;
 var pageFields = [];
 var wordFields = [];
 var popUp = false;
+var mouseDelay = 0;
 
 //Insert Kahn button class
 var Button = function(config) {
@@ -277,6 +278,16 @@ var helpButton = new Button({
         currentScene = 2;
     }
 });
+var helpButton2 = new Button({
+    x: 166,
+    y: 358,
+    width: 85,
+    height: 37,
+    label: "HELP",
+    onClick: function() {
+        currentScene = 2;
+    }
+});
 var returnButton = new Button({
     x: 227,
     y: 359,
@@ -304,11 +315,19 @@ var againButton = new Button({
 
 //Define function to determine which letter has been typed
 var letterSelect = function(){
-    var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+    var characters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", " ", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  for (var i = 48; i <= 57; i++){
+    if (keyCode === i){
+        return characters[i-21];
+    }
+  }
   for (var i = 65; i <= 90; i++){
     if (keyCode === i){
-        return letters[i-65];
+        return characters[i-65];
     }
+  }
+  if (keyCode === 32){
+    return characters[26];
   }
     return "";
 };
@@ -329,6 +348,15 @@ var drawArrow = function(x, y, w, h){
     rect(x + w*0.2, y + h/3.2, w/2.75, h/2.5);
     strokeWeight(1);
     
+};
+
+//Write ticker function
+var ticker = function(){
+    if((round(millis() / 750) % 2) === 0) {
+        return true;
+    } else {
+        return false;
+    }
 };
 
 //Define Field class to track text fields for users to input words
@@ -355,7 +383,8 @@ var Field = function(x, y, width, height, word, image, scene){
             }
         }
     });
-    this.button.scene = scene + 2 || 0;
+    this.button.scene = scene || 0;
+    this.selected = false;
 };
 Field.prototype.draw = function() {
     if (this.complete){
@@ -379,7 +408,17 @@ Field.prototype.draw = function() {
         }
     }
     fill(0, 0, 0);
-    text(this.text, this.x, this.y, this.width, this.height);
+    if(selectedField === this){
+        this.selected = true;
+    } else {
+        this.selected = false;
+    }
+    
+    if(ticker() && this.selected){
+        text(this.text + "|", this.x, this.y, this.width, this.height);
+    } else {
+        text(this.text, this.x, this.y, this.width, this.height);
+    }
 };
 Field.prototype.keyPress = function(){
     this.text += letterSelect();
@@ -400,13 +439,18 @@ Field.prototype.checkCorrect = function(){
     }
 };
 
-//Create Field objects for wordScene and array containing all fields
-var variableWord = new Field(100, 25, 200, 50, answerWords[0], wordImages[0], 1);
-var arrayWord = new Field(100, 100, 200, 50, answerWords[1], wordImages[1], 2);
-var commentWord = new Field(100, 175, 200, 50, answerWords[2], wordImages[2], 3);
-var conditionalWord = new Field(100, 250, 200, 50, answerWords[3], wordImages[3], 4);
-var booleanWord = new Field(100, 325, 200, 50, answerWords[4], wordImages[4], 5);
+var variableWord;
+var arrayWord;
+var commentWord;
+var conditionalWord;
+var booleanWord;
 wordFields = [variableWord, arrayWord, commentWord, conditionalWord, booleanWord];
+
+for (var i = 0; i < wordFields.length; i++){
+    wordFields[i] = new Field(90, (69*i+25), 200, 50, answerWords[i], wordImages[i], (i+3));
+}
+
+var blankField = new Field (600, 600, 10, 10);
 
 var drawPopUp = function(){
     strokeWeight(2);
@@ -476,9 +520,9 @@ var helpScene = function(){
 };
 var wordScene = function(){
     background(123, 171, 227);
-    drawTworekBitmoji(23, 24, 36);
-    drawKinnesBitmoji(377, 351, 76);
-    pageFields = [variableWord, arrayWord, commentWord, conditionalWord, booleanWord];
+    drawTworekBitmoji(376, 24, 36);
+    drawKinnesBitmoji(373, 346, 73);
+    pageFields = wordFields;
     for(var i = 0; i < wordFields.length; i++){
         wordFields[i].draw();
     }
@@ -491,6 +535,7 @@ var wordScene = function(){
     if (allCorrect === pageFields.length){
         currentScene = 8;
     }
+    helpButton2.draw();
 };
 var variablesScene = function(){
     pageFields = [variablesQuestion];
@@ -661,6 +706,7 @@ draw = function() {
 
 //mouseClicked function
 mouseClicked = function() {
+    var checkFields = 0;
     for(var i = 0; i < pageFields.length; i++){
         pageFields[i].checkCorrect();
         if(pageFields[i].isMouseInside()){
@@ -668,7 +714,11 @@ mouseClicked = function() {
             selectedField = pageFields[i];
         } else {
             pageFields[i].color = color(255, 255, 255);
+            checkFields++;
         }
+    }
+    if (checkFields === 5){
+        selectedField = blankField;
     }
     againButton.handleMouseClick();
     returnButton.handleMouseClick();
@@ -680,6 +730,7 @@ mouseClicked = function() {
         for(var i = 0; i < wordFields.length; i++){
             wordFields[i].button.handleMouseClick();
         }
+        helpButton2.handleMouseClick();
     }
 };
 
