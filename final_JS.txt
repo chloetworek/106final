@@ -484,6 +484,7 @@ var submitButton = new Button({
 //Create field objects for gameplay
 var variablesQuestion = new Field(222, 276, 111, 30, "22");
 var arraysQuestion = new Field(182, 317, 191, 35, "FOOTBALL");
+var commentsQuestion = new Field(51, 308, 171, 25, "BEGIN");
 var conditionalsQuestion = new Field(182, 317, 191, 35, "WHOOPS BETTER LUCK NEXT TIME");
 var booleansQuestion = new Field(305, 286, 80, 25, "FALSE");
 
@@ -601,9 +602,33 @@ var arraysScene = function(){
     //correct answer = football
 };
 var commentsScene = function(){
+    pageFields = [commentsQuestion];
     background(55, 255, 0);
+    fill(0, 42, 196);
+    textSize(20);
+    text("What are comments?", 29, 20, 238, 200);
+    rect(29, 45, 191, 5);
     returnButton.draw();
     submitButton.draw();
+    //brief definition
+    textSize(13);
+    text("Comments are a way you can make your code readable for another user. You can write out a short explanation of that section of code to help others learn, add new features, or allow them to fix any bugs they find. ", 29, 68, 334, 200);
+    text('They should always start with two forward slashes, " // ". They can also be used to "comment out" a line of code. So, if those two slashes are present, that line of code will not run.', 88, 145, 302, 200);
+    image(wordImages[2], 26, 144, 56, 56);
+    image(getImage("avatars/questionmark"), 269, 296, 50, 50);
+    //question
+    textSize(18);
+    fill(0, 106, 255);
+    text("Practice!", 29, 216, 200, 200);
+    fill(0, 42, 196);
+    textSize(12);
+    text("Based on the given code, with comments, what will be texted out on the screen?", 30, 246, 165, 200);
+    fill(0, 0, 0);
+    text('text("Begin", 50, 150, 200, 100)', 210, 261, 200, 100);
+    text('//text("Paused", 50, 150, 200, 100)', 210, 278, 200, 100);
+    text('//text("Restart", 50, 150, 200, 100)', 210, 244, 200, 100);
+    commentsQuestion.draw();
+    //correct answer = BEGIN
 };
 var conditionalsScene = function(){
     pageFields = [conditionalsQuestion];
@@ -618,7 +643,7 @@ var conditionalsScene = function(){
     //brief definition
     fill(255, 255, 255);
     textSize(13);
-    text("Usually appearing as if/then statements, they tell the program when to run a specifc line of code.", 61, 68, 264, 200);
+    text("Usually appearing as if/then statements, they tell the program when to run a specific line of code.", 61, 68, 264, 200);
     //basic outline
     text("So, IF one statement is true, then certain lines of code will run... ELSE a different line will run.", 61, 142, 200, 200);
     //question
@@ -676,6 +701,21 @@ var booleansScene = function(){
 };
 var endScene = function(){
     background(247, 0, 255);
+    textAlign(CENTER);
+    textSize(25);
+    fill(0, 255, 251);
+    text("CONGRATS!", 108, 50, 200, 200);
+    textSize(12);
+    fill(0, 0, 0);
+    text("You just succesfully completed a mini crash course about Javascript!", -3, 109, 414, 200);
+    text("Now that you know most of the basics, go out and have fun! Learn more and eventually you can start to code your own creations.", 97, 143, 222, 200);
+    fill(0, 51, 255);
+    textSize(15);
+    text("Come on back to our table and get your little prize!", 109, 269, 200, 200);
+    textAlign(LEFT);
+    image(getImage("cute/Star"), 46, 274, 100, 100);
+    image(getImage("cute/Star"), 161, 294, 100, 100);
+    image(getImage("cute/Star"), 271, 274, 100, 100);
 };
 
 //draw function
