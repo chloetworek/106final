@@ -210,14 +210,22 @@ var drawTworekBitmoji = function (bitmojiX, bitmojiY, h){
 };
 
 //Define global variables
+//Variable to track current scene
 var currentScene = 0;
+//Array containing answers for fields in wordScene
 var answerWords = ["VARIABLE", "ARRAY", "COMMENT", "CONDITIONAL", "BOOLEAN"];
-var wordImages = [getImage("avatars/mr-pants"), getImage("avatars/mr-pants-green"), getImage("avatars/mr-pants-orange"), getImage("avatars/mr-pants-pink"), getImage("avatars/mr-pants-purple")];
+//Array containing images for fields in wordScene
+var wordImages = [getImage("avatars/mr-pants"), getImage("avatars/old-spice-man"), getImage("avatars/mr-pink-orange"), getImage("avatars/spunky-sam-red"), getImage("creatures/Hopper-Jumping")];
+//Currently selected field
 var selectedField;
+//Array containing all fields on the page (redefinied on each scene change)
 var pageFields = [];
+//Array containing fields in wordScene
 var wordFields = [];
+//Trackling variable for pop up window on incorrect answer
 var popUp = false;
-var mouseDelay = 0;
+//Variable to track last scene when using navigation buttons
+var sceneSave = 0;
 
 //Insert Kahn button class
 var Button = function(config) {
@@ -248,7 +256,7 @@ Button.prototype.handleMouseClick = function() {
     }
 };
 
-//Create new button method to change scenes
+//Create new button method to change scenes (Used in Field objects for wordScene)
 Button.prototype.setScene = function() {
    if(currentScene === 1){
        currentScene = this.scene;
@@ -276,6 +284,7 @@ var helpButton = new Button({
     label: "HELP",
     onClick: function() {
         currentScene = 2;
+        sceneSave = 0;
     }
 });
 var helpButton2 = new Button({
@@ -286,17 +295,18 @@ var helpButton2 = new Button({
     label: "HELP",
     onClick: function() {
         currentScene = 2;
+        sceneSave = 1;
     }
 });
 var returnButton = new Button({
-    x: 227,
+    x: 257,
     y: 359,
     width: 102,
     height: 35,
     label: "GO BACK",
     onClick: function() {
         if(currentScene === 2){
-            currentScene = 0;
+            currentScene = sceneSave;
         }else{
             currentScene = 1;
         }
@@ -315,20 +325,28 @@ var againButton = new Button({
 
 //Define function to determine which letter has been typed
 var letterSelect = function(){
+    //Define array of all characters that can be typed
     var characters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", " ", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-  for (var i = 48; i <= 57; i++){
-    if (keyCode === i){
-        return characters[i-21];
+    //Check if the key pressed was a letter
+    for (var i = 48; i <= 57; i++){
+        if (keyCode === i){
+            //return the letter pressed
+            return characters[i-21];
+        }
     }
-  }
-  for (var i = 65; i <= 90; i++){
-    if (keyCode === i){
-        return characters[i-65];
+    //Check if the key pressed was a number
+    for (var i = 65; i <= 90; i++){
+        if (keyCode === i){
+            //return the number pressed
+            return characters[i-65];
+        }
     }
-  }
-  if (keyCode === 32){
-    return characters[26];
-  }
+    //Check if the key pressed was the spacebar
+    if (keyCode === 32){
+        //return a space
+        return characters[26];
+    }
+    //Otherwise, return empty string
     return "";
 };
 
@@ -350,8 +368,9 @@ var drawArrow = function(x, y, w, h){
     
 };
 
-//Write ticker function
+//Define ticker function
 var ticker = function(){
+    //Swap return between true and false every 3/4 of a second
     if((round(millis() / 750) % 2) === 0) {
         return true;
     } else {
@@ -360,17 +379,26 @@ var ticker = function(){
 };
 
 //Define Field class to track text fields for users to input words
+//Define Field constructor function
 var Field = function(x, y, width, height, word, image, scene){
+    //Define coordinate and size related variables
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+    //Define the image relating to the field. If no image, set to 0
     this.image = image || 0;
+    //Define properties to track what has been typed into the field and the correct answer
     this.text = "";
     this.answer = word;
+    //Define color to fill field
     this.color = color(255, 255, 255);
-    this.complete = false;
+    //Define parameters to track if Field is correct/complete
+    //this.correct = true when this.text === this.answer
     this.correct = false;
+    //this.complete = true when the answer is correct AND the page the field leads to is complete
+    this.complete = false;
+    //Create a button object specific to each field
     this.button = new Button({
         x: 0,
         y: 0,
@@ -383,12 +411,15 @@ var Field = function(x, y, width, height, word, image, scene){
             }
         }
     });
+    //Define scene parameter of the Field Button. If no value entered, set to 0
     this.button.scene = scene || 0;
-    this.selected = false;
 };
+//Define function to draw Field objects
 Field.prototype.draw = function() {
+    //Fill green if the Field is marked complete
     if (this.complete){
         fill(70, 252, 38);
+    //Color Field pink if mouse is hovering ofer it
     }else if (this.isMouseInside() && selectedField !== this){
         fill(250, 160, 160);
     }else{
@@ -396,6 +427,7 @@ Field.prototype.draw = function() {
     }
     stroke(0, 0, 0);
     rect(this.x, this.y, this.width, this.height, 5);
+    //Draw image and button only if on the wordScene
     if(currentScene === 1){
         image(this.image, this.x - this.width * 0.3, this.y, this.height, this.height);
         this.button.x = this.x + this.width *1.05;
@@ -408,30 +440,30 @@ Field.prototype.draw = function() {
         }
     }
     fill(0, 0, 0);
-    if(selectedField === this){
-        this.selected = true;
-    } else {
-        this.selected = false;
-    }
-    
-    if(ticker() && this.selected){
+        //Utilize ticker() to add blinking line at end of this.text
+    if(ticker() && (selectedField === this)){
         text(this.text + "|", this.x, this.y, this.width, this.height);
     } else {
         text(this.text, this.x, this.y, this.width, this.height);
     }
 };
+//Define function to handle key presses regarding Field objects
 Field.prototype.keyPress = function(){
+    //Add return from letterSelect() to end of this.text
     this.text += letterSelect();
+    //If packspace was pressed, remove the last character from this.text
     if(keyCode === 8){
         this.text = this.text.slice(0, -1);
     }
 };
+//Check if the mouse is inside a field object
 Field.prototype.isMouseInside = function() {
     return mouseX > this.x &&
            mouseX < (this.x + this.width) &&
            mouseY > this.y &&
            mouseY < (this.y + this.height);
 };
+//Check if the answer typed into the Field object is the correct answer
 Field.prototype.checkCorrect = function(){
     if(this.answer === this.text){
         this.correct = true;
@@ -439,6 +471,7 @@ Field.prototype.checkCorrect = function(){
     }
 };
 
+//Define variables to hold fields for word scene
 var variableWord;
 var arrayWord;
 var commentWord;
@@ -446,12 +479,12 @@ var conditionalWord;
 var booleanWord;
 wordFields = [variableWord, arrayWord, commentWord, conditionalWord, booleanWord];
 
+//Create new field onjects for each of the variables in wordFields
 for (var i = 0; i < wordFields.length; i++){
     wordFields[i] = new Field(90, (69*i+25), 200, 50, answerWords[i], wordImages[i], (i+3));
 }
 
-var blankField = new Field (600, 600, 10, 10);
-
+//Define function to draw pop-up on incorrect guess
 var drawPopUp = function(){
     strokeWeight(2);
     stroke(0, 0, 0);
@@ -471,17 +504,18 @@ var submitButton = new Button({
     height: 35,
     label: "SUBMIT",
     onClick: function() {
+        //Check if all fields on page are correct. If so, set the respective Field.complete = true
         if(pageFields[0].correct){
-            var sceneCheck = currentScene;
+            wordFields[currentScene - 3].complete = true;
             currentScene = 1;
-            wordFields[sceneCheck - 3].complete = true;
+        //Otherwise, display the "Try Again" pop up
         } else {
             popUp = true;
         }
     }
 });
 
-//Create field objects for gameplay
+//Create field objects for individual scene questions
 var variablesQuestion = new Field(222, 276, 111, 30, "22");
 var arraysQuestion = new Field(182, 317, 191, 35, "FOOTBALL");
 var commentsQuestion = new Field(51, 308, 171, 25, "BEGIN");
@@ -718,8 +752,7 @@ var endScene = function(){
     image(getImage("cute/Star"), 271, 274, 100, 100);
 };
 
-//draw function
-//call each scene drawing function based on scene tracking variable
+//Define draw function, calling each scene function based on currentScene
 draw = function() {
     if(popUp){
         drawPopUp();
@@ -744,25 +777,33 @@ draw = function() {
     }
 };
 
-//mouseClicked function
+//Define mouseClicked function
 mouseClicked = function() {
+    //Create local variable to track number of fields checked. Will be used to deselect fields in wordScene
     var checkFields = 0;
+    //Utilize for loop to check fields for correctness and selection based on pageFields
     for(var i = 0; i < pageFields.length; i++){
+        //Check Field for correctness
         pageFields[i].checkCorrect();
+        //If mouse is inside Field being checked, change color to blue and set to selectedField
         if(pageFields[i].isMouseInside()){
             pageFields[i].color = color(74, 210, 255);
             selectedField = pageFields[i];
+        //If mouse is not Field being checked, set color to white, and iterate checkFields
         } else {
             pageFields[i].color = color(255, 255, 255);
             checkFields++;
         }
     }
+    //Check if 5 fields have been checked and not selected. If so, set selectedField to arbitrary integer
     if (checkFields === 5){
-        selectedField = blankField;
+        selectedField = 0;
     }
+    //Handle question scene button mouse clicks
     againButton.handleMouseClick();
     returnButton.handleMouseClick();
     submitButton.handleMouseClick();
+    //Handle clicks relating to specific scenes
     if (currentScene === 0) {
         startButton.handleMouseClick();
         helpButton.handleMouseClick();
@@ -774,6 +815,8 @@ mouseClicked = function() {
     }
 };
 
+//Define keyPressed function
 keyPressed = function() {
+    //Run the keyPress method on the currently selected Field
     selectedField.keyPress();
 };
