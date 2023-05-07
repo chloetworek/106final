@@ -222,7 +222,7 @@ var selectedField;
 var pageFields = [];
 //Array containing fields in wordScene
 var wordFields = [];
-//Trackling variable for pop up window on incorrect answer
+//Tracking variable for pop up window on incorrect answer
 var popUp = false;
 //Variable to track last scene when using navigation buttons
 var sceneSave = 0;
@@ -266,6 +266,8 @@ Button.prototype.setScene = function() {
 };
 
 //Create Button objects
+
+//create start button object to move to wordScene
 var startButton = new Button({
     x: 84,
     y: 264,
@@ -276,6 +278,8 @@ var startButton = new Button({
         currentScene = 1;
     }
 });
+
+//create first help button object on the home screen
 var helpButton = new Button({
     x: 250,
     y: 264,
@@ -283,10 +287,14 @@ var helpButton = new Button({
     height: 37,
     label: "HELP",
     onClick: function() {
+        //moves to the help screen when clicked
         currentScene = 2;
+        //stores the homeScreen 
         sceneSave = 0;
     }
 });
+
+//create the second help button object on the wordScene screen
 var helpButton2 = new Button({
     x: 166,
     y: 358,
@@ -294,10 +302,13 @@ var helpButton2 = new Button({
     height: 37,
     label: "HELP",
     onClick: function() {
+        //moves to the help screen when clicked
         currentScene = 2;
+        //stores the wordScene
         sceneSave = 1;
     }
 });
+//button to return to previous scene (on all of the question scenes and help screen)
 var returnButton = new Button({
     x: 257,
     y: 359,
@@ -312,6 +323,8 @@ var returnButton = new Button({
         }
     }
 });
+
+//create try again button object for pup-up after incorrect answer is submitted
 var againButton = new Button({
     x: 150,
     y: 215,
@@ -319,6 +332,7 @@ var againButton = new Button({
     height: 35,
     label: "Try Again",
     onClick: function() {
+        //pop-up disappears 
         popUp = false;
     }
 });
@@ -522,11 +536,15 @@ var commentsQuestion = new Field(51, 308, 171, 25, "BEGIN");
 var conditionalsQuestion = new Field(182, 317, 191, 35, "WHOOPS BETTER LUCK NEXT TIME");
 var booleansQuestion = new Field(305, 286, 80, 25, "FALSE");
 
-//Define scene functions (8 minimum, splash, word list, 5+ question scenes, end scene)
+//Define scene functions 
+
+//home screen function
 var splashScene = function() {
     background(84, 156, 130);
+    //call bitmojis
     drawTworekBitmoji(50, 29, 50);
     drawKinnesBitmoji(345, 47, 80);
+    //title
     fill(255, 255, 255);
     textSize(22);
     text("Scavenge for Code!", 109, 103, 200, 200);
@@ -534,15 +552,21 @@ var splashScene = function() {
     text("By Chloe Tworek", 162, 136, 100, 100);
     text("and Joshua Kinnes", 158, 148, 100, 100);
     image(getImage("cute/ChestClosed"), 164, 156, 75, 75);
+    //call button draw methods
     startButton.draw();
     helpButton.draw();
 };
+
+//help screen function
 var helpScene = function(){
     background(255, 115, 0);
+    //call button draw method
     returnButton.draw();
+    //title
     textSize(30);
     text("HOW TO PLAY", 100, 25, 250, 100);
     stroke(0, 0, 0);
+    //step-by-step instructions
     line(25, 65, 375, 65);
     textSize(15);
     text("1. Hit START and pay attention to the 5 images shown on screen.", 40, 80, 325, 100);
@@ -550,36 +574,47 @@ var helpScene = function(){
     text("3. When you find a poster, type the word in next to the image and hit the arrow button.", 40, 178, 325, 100);
     text("4. Answer the question on screen and hit SUBMIT", 40, 226, 339, 100);
     text("5. Once you've answered all the questions, come back to the table and show us all 5 check marks for a prize!", 40, 255, 339, 100);
+    //call bitmojis
     drawTworekBitmoji(79, 347, 45);
     drawKinnesBitmoji(152, 355, 75);
 };
+
+//word scene function
 var wordScene = function(){
     background(123, 171, 227);
+    //call bitmojis
     drawTworekBitmoji(376, 24, 36);
     drawKinnesBitmoji(373, 346, 73);
+    //place fields
     pageFields = wordFields;
     for(var i = 0; i < wordFields.length; i++){
-        wordFields[i].draw();
+        wordFields[i].draw(); //wordField drawn for each index of array
     }
-    var allCorrect = 0;
+    var allCorrect = 0; //initial variable for number of correctly answered
     for (var i = 0; i < pageFields.length; i++){
         if (pageFields[i].complete){
-            allCorrect++;
+            allCorrect++; //add one to total correct answers
         }
     }
     if (allCorrect === pageFields.length){
-        currentScene = 8;
+        currentScene = 8; //change to end scene if allCorrect variable equals number of fields
     }
+    //call button draw method
     helpButton2.draw();
 };
+
+//variable scene function
 var variablesScene = function(){
+    //define pageFields array elements for this scene
     pageFields = [variablesQuestion];
     background(242, 162, 162);
+    //title
     textSize(20);
     fill(214, 64, 64);
     text("What are variables?", 36, 20, 200, 200);
     fill(255, 222, 209);
     rect(34, 46, 182, 5);
+    //call button draw methods
     returnButton.draw();
     submitButton.draw();
     //brief definition
@@ -602,19 +637,25 @@ var variablesScene = function(){
     text("var x = 9;", 55, 268, 198, 200);
     text("var y = 13;", 55, 286, 198, 200);
     text("var sum = x + y;", 55, 304, 198, 200);
+    //draw the text fields
     variablesQuestion.draw();
     //correct answer = 22
 };
+
+//array scene function
 var arraysScene = function(){
+    //define pageFields array elements for this scene
     pageFields = [arraysQuestion];
     background(26, 0, 255);
     image(getImage("avatars/questionmark"), 334, 20, 50, 58);
     image(getImage("avatars/avatar-team"), 321, 212, 63, 45);
+    //title
     textSize(20);
     fill(99, 237, 223);
     text("What is an array?", 36, 20, 200, 200);
     fill(255, 255, 255);
     rect(34, 46, 161, 5);
+    //call button draw methods
     returnButton.draw();
     submitButton.draw();
     //brief definition
@@ -632,16 +673,22 @@ var arraysScene = function(){
     text("When looking at the given array, you decide to pull out the value at index 2... what would this be?", 66, 264, 271, 200);
     fill(255, 255, 255);
     text('var topSports = ["soccer", "fieldhockey", "football", "basketball"];', 19, 304, 191, 200);
+    //draw the text fields
     arraysQuestion.draw();
     //correct answer = football
 };
+
+//comment scene function
 var commentsScene = function(){
+    //define pageFields array elements for this scene
     pageFields = [commentsQuestion];
     background(55, 255, 0);
+    //title
     fill(0, 42, 196);
     textSize(20);
     text("What are comments?", 29, 20, 238, 200);
     rect(29, 45, 191, 5);
+    //call button draw methods
     returnButton.draw();
     submitButton.draw();
     //brief definition
@@ -661,17 +708,23 @@ var commentsScene = function(){
     text('text("Begin", 50, 150, 200, 100)', 210, 261, 200, 100);
     text('//text("Paused", 50, 150, 200, 100)', 210, 278, 200, 100);
     text('//text("Restart", 50, 150, 200, 100)', 210, 244, 200, 100);
+    //draw the text fields
     commentsQuestion.draw();
     //correct answer = BEGIN
 };
+
+//conditional scene function
 var conditionalsScene = function(){
+    //define pageFields array elements for this scene
     pageFields = [conditionalsQuestion];
     background(77, 0, 255);
+    //title
     fill(255, 255, 255);
     textSize(20);
     text("What are conditionals?", 29, 20, 238, 200);
     fill(0, 255, 208);
     rect(29, 45, 200, 5);
+    //call button draw methods
     returnButton.draw();
     submitButton.draw();
     //brief definition
@@ -697,15 +750,21 @@ var conditionalsScene = function(){
     fill(0, 255, 208);
     text("Which phrase is going to show on the screen?", 24, 320, 150, 50);
     fill(255, 255, 255);
+    //draw the text fields
     conditionalsQuestion.draw();
     // correct answer = Whoops better luck next time
 };
+
+//boolean scene function
 var booleansScene = function(){
+    //define pageFields array elements for this scene
     pageFields = [booleansQuestion];
     background(255, 208, 0);
     image(wordImages[4], 7, 197, 50, 50);
+    //call button draw methods
     returnButton.draw();
     submitButton.draw();
+    //title
     fill(18, 86, 224);
     textSize(20);
     text("What is a boolean?", 18, 15, 200, 100);
@@ -729,12 +788,15 @@ var booleansScene = function(){
     text("stillPlaying =", 229, 291, 200, 200);
     text(";", 386, 291, 200, 200);
     fill(255, 255, 255);
+    //draw the text fields
     booleansQuestion.draw();
-    //rect(305, 286, 80, 25);
     //correct answer = false
 };
+
+//end scene function
 var endScene = function(){
     background(247, 0, 255);
+    //center the text
     textAlign(CENTER);
     textSize(25);
     fill(0, 255, 251);
@@ -746,6 +808,7 @@ var endScene = function(){
     fill(0, 51, 255);
     textSize(15);
     text("Come on back to our table and get your little prize!", 109, 269, 200, 200);
+    //realign the text back to the left side of the screen
     textAlign(LEFT);
     image(getImage("cute/Star"), 46, 274, 100, 100);
     image(getImage("cute/Star"), 161, 294, 100, 100);
