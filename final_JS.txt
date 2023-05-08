@@ -341,17 +341,17 @@ var againButton = new Button({
 var letterSelect = function(){
     //Define array of all characters that can be typed
     var characters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", " ", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-    //Check if the key pressed was a letter
+    //Check if the key pressed was a number
     for (var i = 48; i <= 57; i++){
         if (keyCode === i){
-            //return the letter pressed
+            //return the number pressed
             return characters[i-21];
         }
     }
-    //Check if the key pressed was a number
+    //Check if the key pressed was a letter
     for (var i = 65; i <= 90; i++){
         if (keyCode === i){
-            //return the number pressed
+            //return the letter pressed
             return characters[i-65];
         }
     }
@@ -493,7 +493,7 @@ var conditionalWord;
 var booleanWord;
 wordFields = [variableWord, arrayWord, commentWord, conditionalWord, booleanWord];
 
-//Create new field onjects for each of the variables in wordFields
+//Create new field objects for each of the variables in wordFields
 for (var i = 0; i < wordFields.length; i++){
     wordFields[i] = new Field(90, (69*i+25), 200, 50, answerWords[i], wordImages[i], (i+3));
 }
